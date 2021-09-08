@@ -1,0 +1,17 @@
+
+Por ahora estamos jugando con un file con halos en un octante de cascaron esferico a una distancia
+media de 950 Mpc/h y de 100 Mpc/h de ancho. 
+
+El file con los halos esta aca: http://iate.oac.uncor.edu/~andres/halos_shell.dat.bz2 
+
+Las columnas son: 
+
+1) RA [deg]
+2) DEC [deg]
+3) redshift
+4) x [Mpc/h] 
+5) y [Mpc/h]
+6) z [Mpc/h]
+7) Distancia [Mpc/h]
+
+

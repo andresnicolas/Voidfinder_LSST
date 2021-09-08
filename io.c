@@ -1,0 +1,98 @@
+
+#include "global.h"
+#include "proto.h"
+
+void read_tracers(char *filename, vector <tracer> &tr)
+{
+  	
+  FILE *f = safe_open(filename,"r");	
+  int i = 0;
+  float ra,dec,redshift,distance,x,y,z;
+
+  while (fscanf(f,"%f %f %f %f %f %f %f",&ra,&dec,&redshift,&distance,&x,&y,&z) > 0) {
+     tr.push_back(tracer());
+     tr[i].phi = ra*DEG2RAD;
+     tr[i].theta = (90.0 - dec)*DEG2RAD;
+     tr[i].redshift = redshift;
+     tr[i].weight = 1.0;
+     i++;
+  };
+
+  fclose(f);
+
+  G.NumTracer = tr.size();
+  G.ShellDist = 950.0;
+  G.ShellThick = 100.0;
+
+}
+
+void create_randoms(vector <tracer> &ran)
+{
+ 
+  float u;
+  float R1 = G.ShellDist - 0.5*G.ShellThick; 
+  float R2 = G.ShellDist + 0.5*G.ShellThick; 
+  
+  G.NumRandom = 30 * G.NumTracer;
+
+  for (int i=0; i<G.NumRandom; i++) {
+     ran.push_back(tracer());
+     
+     u = random_number();
+     ran[i].phi = 2.0 * M_PI * u;
+
+     u = random_number();
+     ran[i].theta = acos(1.0 - 2.0 * u);
+     
+     u = random_number();
+     ran[i].redshift = cbrt(u * pow(R2,3) + (1.0 - u) * pow(R1,3));
+
+     ran[i].weight = 1.0;
+  }  
+
+}
+
+void create_map(vector <tracer> &tr, vector <tracer> &ran, T_Healpix_Base<int> &hp, struct hpmap *map) 
+{
+
+  int i,ipix;
+  pointing p;
+
+  // Mascara angular
+  for (ipix=0; ipix<hp.Npix(); ipix++) {
+      p = hp.pix2ang(ipix);
+      if (p.theta <= 0.5*M_PI && p.phi <= 0.5*M_PI)	
+	 map[ipix].mask = true;
+      else
+	 map[ipix].mask = false;     
+  }
+
+  // Cargo tracers en mapa angular	
+  for (i=0; i<tr.size(); i++) {
+     p.theta = tr[i].theta;
+     p.phi = tr[i].phi;
+     ipix = hp.ang2pix(p);
+     map[ipix].tracer.push_back(i);   
+  }
+
+  // Cargo randoms en mapa angular
+  for (i=0; i<ran.size(); i++) {
+     p.theta = ran[i].theta;
+     p.phi = ran[i].phi;
+     ipix = hp.ang2pix(p);
+     map[ipix].random.push_back(i);   
+  }
+
+  // Calculo delta 
+  
+  float norm = (float) ran.size() / (float) tr.size();
+
+  for (ipix=0; ipix<hp.Npix(); ipix++) {
+      map[ipix].delta = -1.0;
+      if (!map[ipix].mask) continue;
+      float ntrac = (float) map[ipix].tracer.size();
+      float nrand = (float) map[ipix].random.size();
+      map[ipix].delta = (ntrac/nrand)*norm - 1.0;
+  }
+
+}

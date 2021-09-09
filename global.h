@@ -20,7 +20,8 @@ struct tracer {
 struct hpmap {
    vector <int> tracer; 
    vector <int> random; 
-   float delta;         
+   float delta;
+   float delta_smooth;   
    bool mask;
 };
 

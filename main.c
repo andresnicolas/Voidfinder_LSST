@@ -27,7 +27,7 @@ int main()
   pointing ptg; 
   for (int ipix=0; ipix<healpix.Npix(); ipix++) {
       ptg = healpix.pix2ang(ipix);
-      fprintf(f,"%f %f %f \n",ptg.phi,ptg.theta,map[ipix].delta);      
+      fprintf(f,"%f %f %f %f \n",ptg.phi,ptg.theta,map[ipix].delta,map[ipix].delta_smooth);      
   }
   fclose(f);
 

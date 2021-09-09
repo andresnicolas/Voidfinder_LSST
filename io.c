@@ -84,9 +84,7 @@ void create_map(vector <tracer> &tr, vector <tracer> &ran, T_Healpix_Base<int> &
   }
 
   // Calculo delta 
-  
   float norm = (float) ran.size() / (float) tr.size();
-
   for (ipix=0; ipix<hp.Npix(); ipix++) {
       map[ipix].delta = -1.0;
       if (!map[ipix].mask) continue;
@@ -95,4 +93,26 @@ void create_map(vector <tracer> &tr, vector <tracer> &ran, T_Healpix_Base<int> &
       map[ipix].delta = (ntrac/nrand)*norm - 1.0;
   }
 
+  // Calculo delta suavizada 
+  float mean;
+  int np;
+  fix_arr <int,8> neigh;
+  for (ipix=0; ipix<hp.Npix(); ipix++) {
+     if (!map[ipix].mask) {
+	map[ipix].delta_smooth = map[ipix].delta;
+        continue;	
+     }	     
+     mean = map[ipix].delta;
+     np = 1;
+     hp.neighbors(ipix,neigh);
+     for (int in=0; in<8; in++) {
+	 if (neigh[in] == -1) continue;    
+	 if (!map[neigh[in]].mask) continue;
+	 mean += map[neigh[in]].delta;
+	 np++;
+     }
+     mean /= (float)np;
+     map[ipix].delta_smooth = mean;
+  }
+  
 }

@@ -83,14 +83,26 @@ void create_map(vector <tracer> &tr, vector <tracer> &ran, T_Healpix_Base<int> &
      map[ipix].random.push_back(i);   
   }
 
-  // Calculo delta 
-  float norm = (float) ran.size() / (float) tr.size();
+  // Calculo delta
+
+  float wtrac = 0.0;
+  float wrand = 0.0;
+  for (int i=0; i<tr.size(); i++) 
+      wtrac += tr[i].weight;	  
+  for (int i=0; i<ran.size(); i++) 
+      wrand += ran[i].weight;	
+  float norm = wrand / wtrac;
+
   for (ipix=0; ipix<hp.Npix(); ipix++) {
       map[ipix].delta = -1.0;
       if (!map[ipix].mask) continue;
-      float ntrac = (float) map[ipix].tracer.size();
-      float nrand = (float) map[ipix].random.size();
-      map[ipix].delta = (ntrac/nrand)*norm - 1.0;
+      wtrac = 0.0;
+      wrand = 0.0;
+      for (int in=0; in<map[ipix].tracer.size(); in++) 
+	  wtrac += tr[map[ipix].tracer[in]].weight;
+      for (int in=0; in<map[ipix].random.size(); in++) 
+	  wrand += ran[map[ipix].random[in]].weight;
+      map[ipix].delta = (wtrac/wrand)*norm - 1.0;
   }
 
   // Calculo delta suavizada 

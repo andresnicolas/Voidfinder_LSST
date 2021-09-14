@@ -14,12 +14,21 @@ int main()
 
   sprintf(filename,"data/halos_shell.dat");
   read_tracers(filename,tr);
-  create_randoms(ran);
 
-  int order = round((log(G.ShellDist)-0.5*log(3.0))/log(2.0)-1.0);
+  sprintf(filename,"data/random_shell.dat");
+  read_randoms(filename,ran);
+
+  //float Reff = 2.0; // Pixel de R = 2.0 Mpc/h
+  //float o = log(G.ShellDist / Reff / sqrt(3.0)) / log(2.0); 
+  //int order = round(o);
+
+  G.SurveyArea = 4.0 * M_PI / 8.0; // Area (angular) del survey: octante de esfera
+  G.TracPerPix = 10;               // Tracers por pixel
+  G.ShellDist = 950.0;             // Distancia media de la cascara [Mpc/h] 
+  G.ShellThick = 100.0;            // Ancho de la cascara [Mpc/h]
+
+  int order = round(0.5 * log(M_PI * (float) tr.size() / 3.0 / G.SurveyArea / G.TracPerPix) / log(2.0));  	  
   T_Healpix_Base<int> healpix(order,RING);
-  G.PixelArea = (4.0*M_PI*G.ShellDist*G.ShellDist) / (float)healpix.Npix();
-  
   map = (struct hpmap *) malloc(healpix.Npix()*sizeof(struct hpmap));
   create_map(tr,ran,healpix,map);
 

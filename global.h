@@ -26,10 +26,9 @@ struct hpmap {
 };
 
 struct global_data {
-   int NumTracer;
-   int NumRandom;   
+   int TracPerPix;
    float ShellDist;
    float ShellThick;
-   float PixelArea;
+   float SurveyArea;
 };
 extern struct global_data G;

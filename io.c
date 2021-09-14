@@ -20,36 +20,26 @@ void read_tracers(char *filename, vector <tracer> &tr)
 
   fclose(f);
 
-  G.NumTracer = tr.size();
-  G.ShellDist = 950.0;
-  G.ShellThick = 100.0;
-
 }
 
-void create_randoms(vector <tracer> &ran)
+void read_randoms(char *filename, vector <tracer> &ran)
 {
  
-  float u;
-  float R1 = G.ShellDist - 0.5*G.ShellThick; 
-  float R2 = G.ShellDist + 0.5*G.ShellThick; 
-  
-  G.NumRandom = 30 * G.NumTracer;
+  FILE *f = safe_open(filename,"r");	
+  int i = 0;
+  float ra,dec,redshift,distance,x,y,z;
 
-  for (int i=0; i<G.NumRandom; i++) {
+  while (fscanf(f,"%f %f %f %f %f %f %f",&ra,&dec,&redshift,&distance,&x,&y,&z) > 0) {
      ran.push_back(tracer());
-     
-     u = random_number();
-     ran[i].phi = 2.0 * M_PI * u;
-
-     u = random_number();
-     ran[i].theta = acos(1.0 - 2.0 * u);
-     
-     u = random_number();
-     ran[i].redshift = cbrt(u * pow(R2,3) + (1.0 - u) * pow(R1,3));
-
+     ran[i].phi = ra*DEG2RAD;
+     ran[i].theta = (90.0 - dec)*DEG2RAD;
+     ran[i].redshift = redshift;
      ran[i].weight = 1.0;
-  }  
+     i++;
+  };
 
+  fclose(f);
+ 
 }
 
 void create_map(vector <tracer> &tr, vector <tracer> &ran, T_Healpix_Base<int> &hp, struct hpmap *map) 
@@ -128,3 +118,4 @@ void create_map(vector <tracer> &tr, vector <tracer> &ran, T_Healpix_Base<int> &
   }
   
 }
+

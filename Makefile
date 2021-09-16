@@ -19,7 +19,7 @@ OMP = -fopenmp
 
 EXEC = main.x
 
-OBJS = tools.o io.o main.o
+OBJS = tools.o io.o finder.o main.o
 
 INCL = Makefile proto.h global.h
 

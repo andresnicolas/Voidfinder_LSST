@@ -10,6 +10,7 @@ int main()
   char filename[200];
   vector <tracer> tr;
   vector <tracer> ran;
+  vector <voids> v;
   struct hpmap *map;
 
   sprintf(filename,"data/halos_shell.dat");
@@ -32,13 +33,18 @@ int main()
   map = (struct hpmap *) malloc(healpix.Npix()*sizeof(struct hpmap));
   create_map(tr,ran,healpix,map);
 
-  FILE *f = fopen("mapa.dat","w");
-  pointing ptg; 
-  for (int ipix=0; ipix<healpix.Npix(); ipix++) {
-      ptg = healpix.pix2ang(ipix);
-      fprintf(f,"%f %f %f %f \n",ptg.phi,ptg.theta,map[ipix].delta,map[ipix].delta_smooth);      
-  }
-  fclose(f);
+  float delta_seed = -0.5;
+  find_centers(delta_seed,healpix,map,v);
+
+  float delta_cut = -0.9;
+  
+ // FILE *f = fopen("mapa.dat","w");
+ // pointing ptg; 
+ // for (int ipix=0; ipix<healpix.Npix(); ipix++) {
+ //     ptg = healpix.pix2ang(ipix);
+ //     fprintf(f,"%f %f %f %f\n",ptg.phi,ptg.theta,map[ipix].delta,map[ipix].delta_smooth);      
+ // }
+ // fclose(f);
 
   tr.clear();
   ran.clear();

@@ -11,10 +11,16 @@
 using namespace std;
 
 struct tracer {
-   float phi;      /* RA en [rad] */
-   float theta;    /* 90-DEC en [rad] */
+   pointing coord;
    float redshift; 
    float weight;
+};
+
+struct voids {
+   pointing coord_init;	
+   pointing coord;
+   float radius;
+   bool tof;
 };
 
 struct hpmap {

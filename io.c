@@ -11,8 +11,8 @@ void read_tracers(char *filename, vector <tracer> &tr)
 
   while (fscanf(f,"%f %f %f %f %f %f %f",&ra,&dec,&redshift,&distance,&x,&y,&z) > 0) {
      tr.push_back(tracer());
-     tr[i].phi = ra*DEG2RAD;
-     tr[i].theta = (90.0 - dec)*DEG2RAD;
+     tr[i].coord.phi = ra*DEG2RAD;
+     tr[i].coord.theta = (90.0 - dec)*DEG2RAD;
      tr[i].redshift = redshift;
      tr[i].weight = 1.0;
      i++;
@@ -31,8 +31,8 @@ void read_randoms(char *filename, vector <tracer> &ran)
 
   while (fscanf(f,"%f %f %f %f %f %f %f",&ra,&dec,&redshift,&distance,&x,&y,&z) > 0) {
      ran.push_back(tracer());
-     ran[i].phi = ra*DEG2RAD;
-     ran[i].theta = (90.0 - dec)*DEG2RAD;
+     ran[i].coord.phi = ra*DEG2RAD;
+     ran[i].coord.theta = (90.0 - dec)*DEG2RAD;
      ran[i].redshift = redshift;
      ran[i].weight = 1.0;
      i++;
@@ -45,12 +45,9 @@ void read_randoms(char *filename, vector <tracer> &ran)
 void create_map(vector <tracer> &tr, vector <tracer> &ran, T_Healpix_Base<int> &hp, struct hpmap *map) 
 {
 
-  int i,ipix;
-  pointing p;
-
   // Mascara angular
-  for (ipix=0; ipix<hp.Npix(); ipix++) {
-      p = hp.pix2ang(ipix);
+  for (int ipix=0; ipix<hp.Npix(); ipix++) {
+      pointing p = hp.pix2ang(ipix);
       if (p.theta <= 0.5*M_PI && p.phi <= 0.5*M_PI)	
 	 map[ipix].mask = true;
       else
@@ -58,18 +55,14 @@ void create_map(vector <tracer> &tr, vector <tracer> &ran, T_Healpix_Base<int> &
   }
 
   // Cargo tracers en mapa angular	
-  for (i=0; i<tr.size(); i++) {
-     p.theta = tr[i].theta;
-     p.phi = tr[i].phi;
-     ipix = hp.ang2pix(p);
+  for (int i=0; i<tr.size(); i++) {
+     int ipix = hp.ang2pix(tr[i].coord);
      map[ipix].tracer.push_back(i);   
   }
 
   // Cargo randoms en mapa angular
-  for (i=0; i<ran.size(); i++) {
-     p.theta = ran[i].theta;
-     p.phi = ran[i].phi;
-     ipix = hp.ang2pix(p);
+  for (int i=0; i<ran.size(); i++) {
+     int ipix = hp.ang2pix(ran[i].coord);
      map[ipix].random.push_back(i);   
   }
 
@@ -83,7 +76,7 @@ void create_map(vector <tracer> &tr, vector <tracer> &ran, T_Healpix_Base<int> &
       wrand += ran[i].weight;	
   float norm = wrand / wtrac;
 
-  for (ipix=0; ipix<hp.Npix(); ipix++) {
+  for (int ipix=0; ipix<hp.Npix(); ipix++) {
       map[ipix].delta = -1.0;
       if (!map[ipix].mask) continue;
       wtrac = 0.0;
@@ -99,7 +92,7 @@ void create_map(vector <tracer> &tr, vector <tracer> &ran, T_Healpix_Base<int> &
   float mean;
   int np;
   fix_arr <int,8> neigh;
-  for (ipix=0; ipix<hp.Npix(); ipix++) {
+  for (int ipix=0; ipix<hp.Npix(); ipix++) {
      if (!map[ipix].mask) {
 	map[ipix].delta_smooth = map[ipix].delta;
         continue;	

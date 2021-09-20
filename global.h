@@ -20,6 +20,7 @@ struct voids {
    pointing coord_init;	
    pointing coord;
    float radius;
+   float delta;
    bool tof;
 };
 
@@ -29,6 +30,11 @@ struct hpmap {
    float delta;
    float delta_smooth;   
    bool mask;
+};
+
+struct sort {
+  int ord;
+  float val;  
 };
 
 struct global_data {

@@ -34,7 +34,7 @@ int main()
   create_map(tr,ran,healpix,map);
 
   float delta_seed = -0.5;
-  float delta_cut = -0.8;
+  float delta_cut = -0.2;
   find_centers(delta_seed,healpix,map,v);
   find_voids(delta_cut,healpix,map,tr,ran,v);
 

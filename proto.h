@@ -13,3 +13,5 @@ void find_centers(float delta_seed, T_Healpix_Base<int> &hp, struct hpmap *map, 
 void find_voids(float delta_cut, T_Healpix_Base<int> &hp, struct hpmap *map, 
 		vector <tracer> &tr, vector <tracer> &ran, vector <voids> &v);
 
+/* sorting */
+void QSort(struct sort *a, int start, int end);

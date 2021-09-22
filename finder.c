@@ -33,19 +33,16 @@ void find_voids(float delta_cut, T_Healpix_Base<int> &hp, struct hpmap *map,
 {
 
   struct sort *sort_gal,*sort_ran;	
-  vector <float> dist_gal,dist_ran;
+  vector <double> dist_gal,dist_ran;
 
   float reff = 2.0 / sqrt((double)hp.Npix());
   float norm = (float)ran.size() / (float)tr.size(); 
 
-  fprintf(stdout,"size = %d \n",v.size());
-  getchar();
-
   for (int iv=0; iv<v.size(); iv++) {
 
-      float theta1 = v[iv].coord_init.theta;	  
-      float phi1 = v[iv].coord_init.phi;	  
-
+      double theta1 = v[iv].coord_init.theta;	  
+      double phi1 = v[iv].coord_init.phi;	  
+    
       for (int ir=0; ir<10; ir++) { 
 
 	  float radius = reff * (float)(ir+1);    
@@ -57,8 +54,8 @@ void find_voids(float delta_cut, T_Healpix_Base<int> &hp, struct hpmap *map,
           for (int i=0; i<pixels_inside.size(); i++) {
 	      int ipix = pixels_inside[i];	  
 	      if (!map[ipix].mask) continue;	  
-	      ntrac += map[ipix].tracer.size();
-              nrand += map[ipix].random.size();	      
+	      ntrac += map[ipix].ntrac;
+              nrand += map[ipix].nrand;	      
 	  }
 
 	  float delta = norm * ((float)ntrac / (float)nrand) - 1.0;
@@ -78,32 +75,32 @@ void find_voids(float delta_cut, T_Healpix_Base<int> &hp, struct hpmap *map,
              for (int i=0; i<pixels_inside.size(); i++) {
 	         int ipix = pixels_inside[i];	  
 	         if (!map[ipix].mask) continue;	  
-	         ntrac += map[ipix].tracer.size();
-                 nrand += map[ipix].random.size();	      
+	         ntrac += map[ipix].ntrac;
+                 nrand += map[ipix].nrand;	      
 	     }
-
+    	  
 	     for (int i=0; i<pixels_ring.size(); i++) {
 	         int ipix = pixels_ring[i];
 	         if (!map[ipix].mask) continue;
 	        
-	         if (map[ipix].tracer.size() > 0) {
-	            for (int j=0; j<map[ipix].tracer.size(); j++) {
+	         if (map[ipix].ntrac > 0) {
+	            for (int j=0; j<map[ipix].ntrac; j++) {
 	                int id = map[ipix].tracer[j];
-	                float theta2 = tr[id].coord.theta;	  
-                        float phi2 = tr[id].coord.phi;
-	                float dist = acos(cos(theta1) * cos(theta2) 
-	                           + sin(theta1) * sin(theta2) * cos(phi1 - phi2));
+	                double theta2 = tr[id].coord.theta;	  
+                        double phi2 = tr[id].coord.phi;
+	                double dist = acos(cos(theta1) * cos(theta2) 
+	                            + sin(theta1) * sin(theta2) * cos(phi1 - phi2));
 	                dist_gal.push_back(dist);
 	            }
 	         }
 
-	         if (map[ipix].random.size() > 0) {
-	            for (int j=0; j<map[ipix].random.size(); j++) {
+	         if (map[ipix].nrand > 0) {
+	            for (int j=0; j<map[ipix].nrand; j++) {
 	                int id = map[ipix].random[j];
-	                float theta2 = ran[id].coord.theta;	  
-                        float phi2 = ran[id].coord.phi;
-	                float dist = acos(cos(theta1) * cos(theta2) 
-	                           + sin(theta1) * sin(theta2) * cos(phi1 - phi2));
+	                double theta2 = ran[id].coord.theta;	  
+                        double phi2 = ran[id].coord.phi;
+	                double dist = acos(cos(theta1) * cos(theta2) 
+	                            + sin(theta1) * sin(theta2) * cos(phi1 - phi2));
 	                dist_ran.push_back(dist);
 	            }
 	         }
@@ -132,9 +129,11 @@ void find_voids(float delta_cut, T_Healpix_Base<int> &hp, struct hpmap *map,
 	     	        break;
 	         }	
 	         if (kr == -1) continue;
-	          
-	         float delta = norm * ((float)(ntrac + k + 1) / (float)(nrand + kr + 1)) - 1.0;
-
+	         
+		 int nt = ntrac + k + 1;
+		 int nr = nrand + kr + 1; 
+	         float delta = norm * ((float)nt / (float)nr) - 1.0;
+	    
 	         if (delta < delta_cut) {
 	            v[iv].radius = radius;
 	            v[iv].delta = delta;	       

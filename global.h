@@ -25,8 +25,10 @@ struct voids {
 };
 
 struct hpmap {
-   vector <int> tracer; 
-   vector <int> random; 
+   int ntrac;
+   int nrand;
+   int *tracer;
+   int *random;   
    float delta;
    float delta_smooth;   
    bool mask;
@@ -34,7 +36,7 @@ struct hpmap {
 
 struct sort {
   int ord;
-  float val;  
+  double val;  
 };
 
 struct global_data {

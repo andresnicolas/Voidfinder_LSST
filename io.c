@@ -1,6 +1,7 @@
 
 #include "global.h"
 #include "proto.h"
+#include <assert.h>
 
 void read_tracers(char *filename, vector <tracer> &tr)
 {
@@ -45,6 +46,11 @@ void read_randoms(char *filename, vector <tracer> &ran)
 void create_map(vector <tracer> &tr, vector <tracer> &ran, T_Healpix_Base<int> &hp, struct hpmap *map) 
 {
 
+  for (int ipix=0; ipix<hp.Npix(); ipix++) {
+      map[ipix].ntrac = 0;
+      map[ipix].nrand = 0;      
+  }	  
+
   // Mascara angular
   for (int ipix=0; ipix<hp.Npix(); ipix++) {
       pointing p = hp.pix2ang(ipix);
@@ -57,15 +63,37 @@ void create_map(vector <tracer> &tr, vector <tracer> &ran, T_Healpix_Base<int> &
   // Cargo tracers en mapa angular	
   for (int i=0; i<tr.size(); i++) {
      int ipix = hp.ang2pix(tr[i].coord);
-     map[ipix].tracer.push_back(i);   
+     map[ipix].ntrac++;   
+  }
+  
+  for (int ipix=0; ipix<hp.Npix(); ipix++) { 
+      map[ipix].tracer = (int *) malloc(map[ipix].ntrac*sizeof(int));
+      map[ipix].ntrac = 0;
+  }
+
+  for (int i=0; i<tr.size(); i++) {
+     int ipix = hp.ang2pix(tr[i].coord);
+     map[ipix].tracer[map[ipix].ntrac] = i;
+     map[ipix].ntrac++;   
   }
 
   // Cargo randoms en mapa angular
   for (int i=0; i<ran.size(); i++) {
      int ipix = hp.ang2pix(ran[i].coord);
-     map[ipix].random.push_back(i);   
+     map[ipix].nrand++;   
+  }
+  
+  for (int ipix=0; ipix<hp.Npix(); ipix++) {
+      map[ipix].random = (int *) malloc(map[ipix].nrand*sizeof(int));
+      map[ipix].nrand = 0;
   }
 
+  for (int i=0; i<ran.size(); i++) {
+     int ipix = hp.ang2pix(ran[i].coord);
+     map[ipix].random[map[ipix].nrand] = i;
+     map[ipix].nrand++;   
+  }
+   
   // Calculo delta
 
   float wtrac = 0.0;
@@ -81,9 +109,9 @@ void create_map(vector <tracer> &tr, vector <tracer> &ran, T_Healpix_Base<int> &
       if (!map[ipix].mask) continue;
       wtrac = 0.0;
       wrand = 0.0;
-      for (int in=0; in<map[ipix].tracer.size(); in++) 
+      for (int in=0; in<map[ipix].ntrac; in++) 
 	  wtrac += tr[map[ipix].tracer[in]].weight;
-      for (int in=0; in<map[ipix].random.size(); in++) 
+      for (int in=0; in<map[ipix].nrand; in++) 
 	  wrand += ran[map[ipix].random[in]].weight;
       map[ipix].delta = (wtrac/wrand)*norm - 1.0;
   }

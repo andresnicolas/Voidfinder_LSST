@@ -35,7 +35,9 @@ void find_voids(float delta_cut, T_Healpix_Base<int> &hp, struct hpmap *map,
   struct sort *sort_gal,*sort_ran;	
   vector <double> dist_gal,dist_ran;
 
+  float rmax = 10.0 * DEG2RAD;
   float reff = 2.0 / sqrt((double)hp.Npix());
+  int nr = round(rmax/reff);
   float norm = (float)ran.size() / (float)tr.size(); 
 
   for (int iv=0; iv<v.size(); iv++) {
@@ -43,7 +45,7 @@ void find_voids(float delta_cut, T_Healpix_Base<int> &hp, struct hpmap *map,
       double theta1 = v[iv].coord_init.theta;	  
       double phi1 = v[iv].coord_init.phi;	  
     
-      for (int ir=0; ir<10; ir++) { 
+      for (int ir=nr; ir>=0; ir--) { 
 
 	  float radius = reff * (float)(ir+1);    
           rangeset pix = hp.query_disc(v[iv].coord_init,radius);
@@ -60,7 +62,7 @@ void find_voids(float delta_cut, T_Healpix_Base<int> &hp, struct hpmap *map,
 
 	  float delta = norm * ((float)ntrac / (float)nrand) - 1.0;
 
-	  if (delta > delta_cut) {
+	  if (delta < delta_cut) {
 
 	     float r1 = reff * (float)ir;    
 	     float r2 = reff * (float)(ir+1);
@@ -150,7 +152,7 @@ void find_voids(float delta_cut, T_Healpix_Base<int> &hp, struct hpmap *map,
 	  }
       }
       
-      if (v[iv].tof) fprintf(stdout,"%d %f %f \n",iv,v[iv].radius*G.ShellDist,v[iv].delta);
+      if (v[iv].tof) fprintf(stdout,"%f %f %f \n",v[iv].radius*G.ShellDist,v[iv].coord_init.phi*RAD2DEG,90.0-v[iv].coord_init.theta*RAD2DEG);
   }	  
 
 }

@@ -22,6 +22,7 @@ void find_centers(float delta_seed, T_Healpix_Base<int> &hp, struct hpmap *map, 
 	 if (!center) continue;     
      	 v.push_back(voids());
          v[i].coord_init = hp.pix2ang(ipix);
+	 v[i].radius = 0.0;
 	 i++;
       }
   }
@@ -151,8 +152,79 @@ void find_voids(float delta_cut, T_Healpix_Base<int> &hp, struct hpmap *map,
 	     break;
 	  }
       }
-      
-      if (v[iv].tof) fprintf(stdout,"%f %f %f \n",v[iv].radius*G.ShellDist,v[iv].coord_init.phi*RAD2DEG,90.0-v[iv].coord_init.theta*RAD2DEG);
   }	  
+
+  // Cargo voids en mapa angular
+  for (int i=0; i<v.size(); i++) {
+      int ipix = hp.ang2pix(v[i].coord_init);
+      map[ipix].nvoid++;      
+  }
+
+  for (int ipix=0; ipix<hp.Npix(); ipix++) { 
+      map[ipix].voids = (int *) malloc(map[ipix].nvoid*sizeof(int));
+      map[ipix].nvoid = 0;
+  }
+
+  for (int i=0; i<v.size(); i++) {
+     int ipix = hp.ang2pix(v[i].coord_init);
+     map[ipix].voids[map[ipix].nvoid] = i;
+     map[ipix].nvoid++;   
+  }
+
+}
+
+void clean_voids(float tol, T_Healpix_Base<int> &hp, struct hpmap *map, 
+		 vector <voids> &v)
+{
+
+  int nv = 0;
+  for (int i=0; i<v.size(); i++) 
+      if (v[i].tof) nv++;
+
+  struct sort *sort_void = (struct sort *) malloc(nv*sizeof(struct sort));
+
+  nv = 0;
+  for (int i=0; i<v.size(); i++) {
+      if (v[i].tof) {
+	 sort_void[nv].val = v[i].radius;
+         sort_void[nv].ord = i;
+         nv++;	 
+      }
+  }
+
+  QSort(sort_void,0,nv-1);
+
+  for (int i=nv-1; i>=0; i--) {
+
+      int iv1 = sort_void[i].ord;	  
+      if (!v[iv1].tof) continue;
+
+      double theta1 = v[iv1].coord_init.theta;
+      double phi1 = v[iv1].coord_init.phi;
+      double rad1 = v[iv1].radius;
+      rangeset pix = hp.query_disc_inclusive(v[iv1].coord_init,2.0*rad1,4);
+      vector <int> pixels = pix.toVector();
+
+      for (int ip=0; ip<pixels.size(); ip++) {
+          int ipix = pixels[ip];
+	  if (!map[ipix].mask) continue;
+	         
+	  if (map[ipix].nvoid > 0) {
+	     for (int j=0; j<map[ipix].nvoid; j++) {
+	         int iv2 = map[ipix].voids[j];
+		 if (!v[iv2].tof || iv1 == iv2) continue;
+	         double theta2 = v[iv2].coord_init.theta;	  
+                 double phi2 = v[iv2].coord_init.phi;
+		 double rad2 = v[iv2].radius;
+	         double dist = acos(cos(theta1) * cos(theta2) 
+	                     + sin(theta1) * sin(theta2) * cos(phi1 - phi2));
+		 
+		 if (dist < (1.0 - tol) * (rad1 + rad2)) v[iv2].tof = false;
+	     }
+	  }
+      }
+  }
+     
+  free(sort_void);
 
 }

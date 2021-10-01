@@ -31,9 +31,20 @@ int main()
 
   float delta_seed = -0.3;
   float delta_cut = -0.4;
+  float tol = 0.0;
   find_centers(delta_seed,healpix,map,v);
   find_voids(delta_cut,healpix,map,tr,ran,v);
+  clean_voids(tol,healpix,map,v);
 
+  FILE *f1 = fopen("all.dat","w");
+  FILE *f2 = fopen("clean.dat","w");
+  for (int iv=0; iv<v.size(); iv++) {
+      if (v[iv].radius > 0.0) fprintf(f1,"%f %f %f \n",v[iv].radius*G.ShellDist,v[iv].coord_init.phi*RAD2DEG,90.0-v[iv].coord_init.theta*RAD2DEG); 	  
+      if (v[iv].tof) fprintf(f2,"%f %f %f \n",v[iv].radius*G.ShellDist,v[iv].coord_init.phi*RAD2DEG,90.0-v[iv].coord_init.theta*RAD2DEG);  
+  }
+  fclose(f1);
+  fclose(f2);
+   
  // FILE *f = fopen("mapa.dat","w");
  // pointing ptg; 
  // for (int ipix=0; ipix<healpix.Npix(); ipix++) {

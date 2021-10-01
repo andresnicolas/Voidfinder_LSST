@@ -27,8 +27,10 @@ struct voids {
 struct hpmap {
    int ntrac;
    int nrand;
+   int nvoid;
    int *tracer;
-   int *random;   
+   int *random;
+   int *voids;   
    float delta;
    float delta_smooth;   
    bool mask;

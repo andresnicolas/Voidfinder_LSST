@@ -9,7 +9,9 @@ void read_randoms(char *filename, vector <tracer> &ran);
 void create_map(vector <tracer> &tr, vector <tracer> &ran, T_Healpix_Base<int> &hp, struct hpmap *map);
 
 /* finder */
-void find_centers(float delta_seed, T_Healpix_Base<int> &hp, struct hpmap *map, vector <voids> &v);
+//void find_centers(float delta_seed, T_Healpix_Base<int> &hp, struct hpmap *map, vector <voids> &v);
+void find_candidates(float delta_cut, T_Healpix_Base<int> &hp, struct hpmap *map, 
+		     vector <tracer> &tr, vector <tracer> &ran, vector <voids> &v);
 void find_voids(float delta_cut, T_Healpix_Base<int> &hp, struct hpmap *map, 
 		vector <tracer> &tr, vector <tracer> &ran, vector <voids> &v);
 void clean_voids(float tol, T_Healpix_Base<int> &hp, struct hpmap *map, 

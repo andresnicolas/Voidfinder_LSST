@@ -13,6 +13,9 @@ int main()
   vector <voids> v;
   struct hpmap *map;
 
+  int ncores = 8;
+  omp_set_num_threads(ncores);
+
   sprintf(filename,"data/halos_shell.dat");
   read_tracers(filename,tr);
 
@@ -29,18 +32,18 @@ int main()
   map = (struct hpmap *) malloc(healpix.Npix()*sizeof(struct hpmap));
   create_map(tr,ran,healpix,map);
 
-  float delta_seed = -0.3;
-  float delta_cut = -0.4;
+  //float delta_seed = -0.3;
+  float delta_cut = -0.6;
   float tol = 0.0;
-  find_centers(delta_seed,healpix,map,v);
+  find_candidates(delta_cut,healpix,map,tr,ran,v);
   find_voids(delta_cut,healpix,map,tr,ran,v);
   clean_voids(tol,healpix,map,v);
 
   FILE *f1 = fopen("all.dat","w");
   FILE *f2 = fopen("clean.dat","w");
   for (int iv=0; iv<v.size(); iv++) {
-      if (v[iv].radius > 0.0) fprintf(f1,"%f %f %f \n",v[iv].radius*G.ShellDist,v[iv].coord_init.phi*RAD2DEG,90.0-v[iv].coord_init.theta*RAD2DEG); 	  
-      if (v[iv].tof) fprintf(f2,"%f %f %f \n",v[iv].radius*G.ShellDist,v[iv].coord_init.phi*RAD2DEG,90.0-v[iv].coord_init.theta*RAD2DEG);  
+      if (v[iv].radius > 0.0) fprintf(f1,"%f %f %f \n",v[iv].radius*G.ShellDist,v[iv].coord.phi*RAD2DEG,90.0-v[iv].coord.theta*RAD2DEG); 	  
+      if (v[iv].tof) fprintf(f2,"%f %f %f \n",v[iv].radius*G.ShellDist,v[iv].coord.phi*RAD2DEG,90.0-v[iv].coord.theta*RAD2DEG);  
   }
   fclose(f1);
   fclose(f2);

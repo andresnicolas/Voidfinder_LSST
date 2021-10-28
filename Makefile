@@ -19,9 +19,9 @@ OMP = -fopenmp
 
 EXEC = main.x
 
-OBJS = tools.o io.o qsort.o finder.o main.o
+OBJS = io.o qsort.o map.o finder.o main.o
 
-INCL = Makefile proto.h global.h
+INCL = Makefile io.h qsort.h finder.h map.h global.h
 
 CFLAGS += $(OMP) $(PIXINC) 
    	

@@ -1,5 +1,8 @@
 
 #include "global.h"
+#include "io.h"
+#include "map.h"
+#include "finder.h"
 #include "proto.h"
 
 struct global_data G;
@@ -30,14 +33,21 @@ int main()
   int order = round(0.5*log(M_PI*(float)tr.size()/3.0/G.SurveyArea/G.TracPerPix)/log(2.0));  
   T_Healpix_Base<int> healpix(order,RING);
   map = (struct hpmap *) malloc(healpix.Npix()*sizeof(struct hpmap));
-  create_map(tr,ran,healpix,map);
+ 
+  map_load_tracers(tr,healpix,map);
+  map_load_randoms(ran,healpix,map);
+  map_load_mask(healpix,map);
+  map_compute_delta(tr,ran,healpix.Npix(),map);
+ 
+  //create_map(tr,ran,healpix,map);
 
-  //float delta_seed = -0.3;
   float delta_cut = -0.6;
   float tol = 0.0;
   find_candidates(delta_cut,healpix,map,tr,ran,v);
   find_voids(delta_cut,healpix,map,tr,ran,v);
+  map_load_voids(v,healpix,map);
   clean_voids(tol,healpix,map,v);
+
 
   FILE *f1 = fopen("all.dat","w");
   FILE *f2 = fopen("clean.dat","w");

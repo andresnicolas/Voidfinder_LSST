@@ -1,5 +1,5 @@
 #include "global.h"
-#include "proto.h"
+#include "qsort.h"
 
 void QSort(struct sort *a, int start, int end)
 {

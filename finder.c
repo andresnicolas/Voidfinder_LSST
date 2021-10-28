@@ -1,7 +1,10 @@
 
 #include "global.h"
-#include "proto.h"
-                  
+#include "io.h"
+#include "map.h"
+#include "finder.h"
+#include "qsort.h"
+
 void find_candidates(float delta_cut, T_Healpix_Base<int> &hp, struct hpmap *map, 
 		     vector <tracer> &tr, vector <tracer> &ran, vector <voids> &v)
 {
@@ -21,7 +24,7 @@ void find_candidates(float delta_cut, T_Healpix_Base<int> &hp, struct hpmap *map
 
   for (int ipix=0; ipix<hp.Npix(); ipix++) {
       
-      if (!map[ipix].mask) continue;
+      if (!map[ipix].mask || map[ipix].delta > 0.0) continue;
 
       for (int ir=nr; ir>=0; ir--) { 
 
@@ -68,6 +71,8 @@ void find_voids(float delta_cut, T_Healpix_Base<int> &hp, struct hpmap *map,
   vector <double> dist_gal,dist_ran;
 
   float norm = (float)ran.size() / (float)tr.size(); 
+
+  fprintf(stdout,"%d\n",v.size());
 
 #pragma omp parallel for \
         schedule(dynamic) \
@@ -163,23 +168,6 @@ void find_voids(float delta_cut, T_Healpix_Base<int> &hp, struct hpmap *map,
       free(sort_ran);
 
   }	  
-
-  // Cargo voids en mapa angular
-  for (int i=0; i<v.size(); i++) {
-      int ipix = hp.ang2pix(v[i].coord);
-      map[ipix].nvoid++;      
-  }
-
-  for (int ipix=0; ipix<hp.Npix(); ipix++) { 
-      map[ipix].voids = (int *) malloc(map[ipix].nvoid*sizeof(int));
-      map[ipix].nvoid = 0;
-  }
-
-  for (int i=0; i<v.size(); i++) {
-     int ipix = hp.ang2pix(v[i].coord);
-     map[ipix].voids[map[ipix].nvoid] = i;
-     map[ipix].nvoid++;   
-  }
 
 }
 

@@ -3,9 +3,6 @@
 #include "io.h"
 #include "map.h"
 #include "finder.h"
-#include "proto.h"
-
-struct global_data G;
 
 int main()
 {
@@ -25,12 +22,14 @@ int main()
   sprintf(filename,"data/random_shell.dat");
   read_randoms(filename,ran);
 
-  G.SurveyArea = 4.0 * M_PI / 8.0; // Area (angular) del survey: octante de esfera
-  G.TracPerPix = 10;               // Tracers por pixel
-  G.ShellDist = 950.0;             // Distancia media de la cascara [Mpc/h] 
-  G.ShellThick = 100.0;            // Ancho de la cascara [Mpc/h]
+  int TracPerPix = 10;                  // Tracers por pixel
+  float SurveyArea = 4.0 * M_PI / 8.0; // Area (angular) del survey: octante de esfera
+  float ShellDist = 950.0;             // Distancia media de la cascara [Mpc/h] 
+  float ShellThick = 100.0;            // Ancho de la cascara [Mpc/h]
+  float delta_cut = -0.6;
+  float tol = 0.0;
 
-  int order = round(0.5*log(M_PI*(float)tr.size()/3.0/G.SurveyArea/G.TracPerPix)/log(2.0));  
+  int order = round(0.5*log(M_PI*(float)tr.size()/3.0/SurveyArea/TracPerPix)/log(2.0));  
   T_Healpix_Base<int> healpix(order,RING);
   map = (struct hpmap *) malloc(healpix.Npix()*sizeof(struct hpmap));
  
@@ -38,22 +37,16 @@ int main()
   map_load_randoms(ran,healpix,map);
   map_load_mask(healpix,map);
   map_compute_delta(tr,ran,healpix.Npix(),map);
- 
-  //create_map(tr,ran,healpix,map);
-
-  float delta_cut = -0.6;
-  float tol = 0.0;
   find_candidates(delta_cut,healpix,map,tr,ran,v);
   find_voids(delta_cut,healpix,map,tr,ran,v);
   map_load_voids(v,healpix,map);
   clean_voids(tol,healpix,map,v);
 
-
   FILE *f1 = fopen("all.dat","w");
   FILE *f2 = fopen("clean.dat","w");
   for (int iv=0; iv<v.size(); iv++) {
-      if (v[iv].radius > 0.0) fprintf(f1,"%f %f %f \n",v[iv].radius*G.ShellDist,v[iv].coord.phi*RAD2DEG,90.0-v[iv].coord.theta*RAD2DEG); 	  
-      if (v[iv].tof) fprintf(f2,"%f %f %f \n",v[iv].radius*G.ShellDist,v[iv].coord.phi*RAD2DEG,90.0-v[iv].coord.theta*RAD2DEG);  
+      if (v[iv].radius > 0.0) fprintf(f1,"%f %f %f \n",v[iv].radius*ShellDist,v[iv].coord.phi*RAD2DEG,90.0-v[iv].coord.theta*RAD2DEG); 	  
+      if (v[iv].tof) fprintf(f2,"%f %f %f \n",v[iv].radius*ShellDist,v[iv].coord.phi*RAD2DEG,90.0-v[iv].coord.theta*RAD2DEG);  
   }
   fclose(f1);
   fclose(f2);

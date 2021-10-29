@@ -1,4 +1,4 @@
-#include "global.h"
+
 #include "qsort.h"
 
 void QSort(struct sort *a, int start, int end)

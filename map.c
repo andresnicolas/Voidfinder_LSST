@@ -84,7 +84,8 @@ void map_compute_delta(vector <tracer> &tr, vector <tracer> &ran, int npix, stru
       wtrac += tr[i].weight;	  
   for (int i=0; i<ran.size(); i++) 
       wrand += ran[i].weight;	
-  float norm = wrand / wtrac;
+
+  const float norm = wrand / wtrac;
 
   for (int ipix=0; ipix<npix; ipix++) {
       map[ipix].delta = -1.0;

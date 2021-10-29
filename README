@@ -9,10 +9,6 @@ Las columnas son:
 
 1) RA [deg]
 2) DEC [deg]
-3) redshift
-4) Distancia [Mpc/h]
-5) x [Mpc/h] 
-6) y [Mpc/h]
-7) z [Mpc/h]
+3) weight
 
 

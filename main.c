@@ -23,13 +23,15 @@ int main()
   read_randoms(filename,ran);
 
   int TracPerPix = 10;                  // Tracers por pixel
-  float SurveyArea = 4.0 * M_PI / 8.0; // Area (angular) del survey: octante de esfera
-  float ShellDist = 950.0;             // Distancia media de la cascara [Mpc/h] 
-  float ShellThick = 100.0;            // Ancho de la cascara [Mpc/h]
-  float delta_cut = -0.6;
-  float tol = 0.0;
+  float SurveyArea = 4.0 * M_PI / 8.0;  // Area (angular) del survey: octante de esfera
+  float ShellDist = 950.0;              // Distancia media de la cascara [Mpc/h] 
+  float ShellThick = 100.0;             // Ancho de la cascara [Mpc/h]
+  float delta_cut = -0.6;               // Delta de corte
+  float tol = 0.0;                      // Tolerancia superposicion
+  float rmax = 10.0 * DEG2RAD;          // Radio angular maximo  
 
   int order = round(0.5*log(M_PI*(float)tr.size()/3.0/SurveyArea/TracPerPix)/log(2.0));  
+
   T_Healpix_Base<int> healpix(order,RING);
   map = (struct hpmap *) malloc(healpix.Npix()*sizeof(struct hpmap));
  
@@ -37,30 +39,17 @@ int main()
   map_load_randoms(ran,healpix,map);
   map_load_mask(healpix,map);
   map_compute_delta(tr,ran,healpix.Npix(),map);
-  find_candidates(delta_cut,healpix,map,tr,ran,v);
+  find_candidates(delta_cut,rmax,healpix,map,tr,ran,v);
   find_voids(delta_cut,healpix,map,tr,ran,v);
   map_load_voids(v,healpix,map);
   clean_voids(tol,healpix,map,v);
 
-  FILE *f1 = fopen("all.dat","w");
-  FILE *f2 = fopen("clean.dat","w");
-  for (int iv=0; iv<v.size(); iv++) {
-      if (v[iv].radius > 0.0) fprintf(f1,"%f %f %f \n",v[iv].radius*ShellDist,v[iv].coord.phi*RAD2DEG,90.0-v[iv].coord.theta*RAD2DEG); 	  
-      if (v[iv].tof) fprintf(f2,"%f %f %f \n",v[iv].radius*ShellDist,v[iv].coord.phi*RAD2DEG,90.0-v[iv].coord.theta*RAD2DEG);  
-  }
-  fclose(f1);
-  fclose(f2);
-   
- // FILE *f = fopen("mapa.dat","w");
- // pointing ptg; 
- // for (int ipix=0; ipix<healpix.Npix(); ipix++) {
- //     ptg = healpix.pix2ang(ipix);
- //     fprintf(f,"%f %f %f %f\n",ptg.phi,ptg.theta,map[ipix].delta,map[ipix].delta_smooth);      
- // }
- // fclose(f);
+  sprintf(filename,"data/voids_2D.dat");
+  write_voids(filename,v);
 
   tr.clear();
   ran.clear();
+  v.clear();
   for (int ipix=0; ipix<healpix.Npix(); ipix++) {
      free(map[ipix].tracer);
      free(map[ipix].random);

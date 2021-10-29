@@ -5,14 +5,13 @@
 #include "finder.h"
 #include "qsort.h"
 
-void find_candidates(float delta_cut, T_Healpix_Base<int> &hp, struct hpmap *map, 
+void find_candidates(float delta_cut, float rmax, T_Healpix_Base<int> &hp, struct hpmap *map, 
 		     vector <tracer> &tr, vector <tracer> &ran, vector <voids> &v)
 {
 
-  float rmax = 10.0 * DEG2RAD;
-  float reff = 2.0 / sqrt((double)hp.Npix());
-  int nr = round(rmax/reff);
-  float norm = (float)ran.size() / (float)tr.size(); 
+  const float reff = 2.0 / sqrt((double)hp.Npix());
+  const int nr = round(rmax/reff);
+  const float norm = (float)ran.size() / (float)tr.size(); 
   
   int i = 0;	
   bool center;
@@ -70,9 +69,7 @@ void find_voids(float delta_cut, T_Healpix_Base<int> &hp, struct hpmap *map,
   struct sort *sort_gal,*sort_ran;	
   vector <double> dist_gal,dist_ran;
 
-  float norm = (float)ran.size() / (float)tr.size(); 
-
-  fprintf(stdout,"%d\n",v.size());
+  const float norm = (float)ran.size() / (float)tr.size(); 
 
 #pragma omp parallel for \
         schedule(dynamic) \
@@ -226,3 +223,4 @@ void clean_voids(float tol, T_Healpix_Base<int> &hp, struct hpmap *map,
   free(sort_void);
 
 }
+

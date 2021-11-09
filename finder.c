@@ -5,16 +5,26 @@
 #include "finder.h"
 #include "qsort.h"
 
+/*
+ * Search void candidates by checking all pixels with negative density contrast. 
+ * The routine estimates a radius by counting the tracers of in pixels completely 
+ * inside. 
+ */
+
 void find_candidates(float delta_cut, float rmax, T_Healpix_Base<int> &hp, struct hpmap *map, 
 		     vector <tracer> &tr, vector <tracer> &ran, vector <voids> &v)
 {
 
+  /// Effective radius of a pixel
   const float reff = 2.0 / sqrt((double)hp.Npix());
+  
+  /// Number of spherical bins
   const int nr = round(rmax/reff);
+
+  /// Normalization to compute density contrast
   const float norm = (float)ran.size() / (float)tr.size(); 
   
   int i = 0;	
-  bool center;
   
   #pragma omp parallel for \
               schedule(dynamic) \
@@ -23,7 +33,7 @@ void find_candidates(float delta_cut, float rmax, T_Healpix_Base<int> &hp, struc
 
   for (int ipix=0; ipix<hp.Npix(); ipix++) {
       
-      if (!map[ipix].mask || map[ipix].delta > 0.0) continue;
+      if (!map[ipix].mask || map[ipix].delta > 0.0) continue; 
 
       for (int ir=nr; ir>=0; ir--) { 
 
@@ -41,8 +51,10 @@ void find_candidates(float delta_cut, float rmax, T_Healpix_Base<int> &hp, struc
               nrand += map[ipix].nrand;	      
           }
 
+	  /// density contrast considering only tracers in pixels within radius
           float delta = norm * ((float)ntrac / (float)nrand) - 1.0;
 
+	  /// Void candidate found
 	  if (delta < delta_cut) {
              #pragma omp critical 
 	     {
@@ -56,11 +68,12 @@ void find_candidates(float delta_cut, float rmax, T_Healpix_Base<int> &hp, struc
 	     }	     
 	     break;
 		   
-	  } // delta < delta_cut
-      } // loop radius 
-  } // loop pixel 
+	  } 
+      } /// end loop ir
+  } /// end loop ipix
 
 }
+
 
 void find_voids(float delta_cut, T_Healpix_Base<int> &hp, struct hpmap *map, 
 		vector <tracer> &tr, vector <tracer> &ran, vector <voids> &v)

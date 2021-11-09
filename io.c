@@ -2,6 +2,10 @@
 #include "global.h"
 #include "io.h"
 
+/*
+ * Safe open for input/output files
+ */
+
 FILE *safe_open(char *filename, const char *mode)
 {
   FILE *f;
@@ -14,6 +18,13 @@ FILE *safe_open(char *filename, const char *mode)
 
   return f; 
 }
+
+/*
+ * Reads tracers information in ascii format:
+ * #1 - RA in [deg]
+ * #2 - DEC in [deg]
+ * #3 - Weight
+ */
 
 void read_tracers(char *filename, vector <tracer> &tr)
 {
@@ -34,6 +45,13 @@ void read_tracers(char *filename, vector <tracer> &tr)
 
 }
 
+/*
+ * Reads randoms information in ascii format:
+ * #1 - RA in [deg]
+ * #2 - DEC in [deg]
+ * #3 - Weight
+ */
+
 void read_randoms(char *filename, vector <tracer> &ran)
 {
  
@@ -52,6 +70,14 @@ void read_randoms(char *filename, vector <tracer> &ran)
   fclose(f);
  
 }
+
+/*
+ * Writes voids catalogue in ascii format:
+ * #1 - Radius in [rad]
+ * #2 - RA in [deg]
+ * #3 - DEC in [deg]
+ * #4 - Integrated delta at Rvoid
+ */ 
 
 void write_voids(char *filename, vector <voids> &v)
 {

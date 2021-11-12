@@ -3,6 +3,10 @@
 #include "io.h"
 #include "map.h"
 
+/*
+ * Creates HealPix map with tracers
+ */
+
 void map_load_tracers(vector <tracer> &tr, T_Healpix_Base<int> &hp, struct hpmap *map)
 {
 
@@ -26,6 +30,10 @@ void map_load_tracers(vector <tracer> &tr, T_Healpix_Base<int> &hp, struct hpmap
   }
 
 }
+
+/*
+ * Creates HealPix map with randoms
+ */
 
 void map_load_randoms(vector <tracer> &ran, T_Healpix_Base<int> &hp, struct hpmap *map) 
 {
@@ -51,6 +59,10 @@ void map_load_randoms(vector <tracer> &ran, T_Healpix_Base<int> &hp, struct hpma
 
 }
 
+/*
+ * Creates HealPix map with void centers
+ */
+
 void map_load_voids(vector <voids> &v, T_Healpix_Base<int> &hp, struct hpmap *map)
 {
 
@@ -74,6 +86,10 @@ void map_load_voids(vector <voids> &v, T_Healpix_Base<int> &hp, struct hpmap *ma
   }
 
 }
+
+/*
+ * Computes the density contrast for all pixels of the HealPix map
+ */
 
 void map_compute_delta(vector <tracer> &tr, vector <tracer> &ran, int npix, struct hpmap *map)
 {
@@ -100,6 +116,10 @@ void map_compute_delta(vector <tracer> &tr, vector <tracer> &ran, int npix, stru
   }
 
 }
+
+/*
+ * Load the angular mask of the catalogue into the Healpix map
+ */
 
 void map_load_mask(T_Healpix_Base<int> &hp, struct hpmap *map)
 {

@@ -1,14 +1,20 @@
 
+/// HealPix map 
+
 struct hpmap {
-   int ntrac;
-   int nrand;
-   int nvoid;
-   int *tracer;
-   int *random;
-   int *voids;   
-   float delta;
-   bool mask;
+   int ntrac;    /// number of tracers 
+   int nrand;    /// number of randoms
+   int nvoid;    /// number of void centers
+   int *tracer;  /// tracers IDs
+   int *random;  /// randoms IDs
+   int *voids;   /// voids IDs
+   float delta;  /// density contrast
+   bool mask;    /// angular mask
 };
+
+/*
+ * Prototypes for HealPix map routines 
+ */
 
 void map_load_tracers(vector <tracer> &tr, T_Healpix_Base<int> &hp, struct hpmap *map);
 void map_load_randoms(vector <tracer> &ran, T_Healpix_Base<int> &hp, struct hpmap *map); 

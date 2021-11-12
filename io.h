@@ -16,6 +16,8 @@ struct voids {
    pointing coord; /// angular coordinated (phi,theta)
    float radius;   /// angular radius in [rad]
    float delta;    /// integrated density contrast at Rvoid
+   int ntrac;      /// number of tracers within Rvoid
+   int nrand;      /// number of randoms within Rvoid
    bool tof;       /// internal flag to dismiss voids candidates
 };
 

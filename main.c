@@ -44,7 +44,7 @@ int main()
   map_load_voids(v,healpix,map);
   clean_voids(tol,healpix,map,v);
 
-  sprintf(filename,"data/voids_2D.dat");
+  sprintf(filename,"data/voids_2D_2.dat");
   write_voids(filename,v);
 
   tr.clear();

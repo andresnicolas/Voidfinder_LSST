@@ -91,7 +91,7 @@ void write_voids(char *filename, vector <voids> &v)
       float ra = v[i].coord.phi*RAD2DEG;
       float dec = 90.0 - v[i].coord.theta*RAD2DEG;  
 
-      fprintf(f,"%8.6f %12.6f %12.6f %8.6f \n",v[i].radius,ra,dec,v[i].delta);
+      fprintf(f,"%8.6f %12.6f %12.6f %8.6f %5d %5d \n",v[i].radius,ra,dec,v[i].delta,v[i].ntrac,v[i].nrand);
 
   }
 
